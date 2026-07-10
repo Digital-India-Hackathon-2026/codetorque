@@ -218,6 +218,23 @@ export default function LoginScreen({ onDone }) {
               <button className="btn-gradient" onClick={onDone} style={{ marginTop: 8 }}>
                 LOGIN
               </button>
+              <button 
+                onClick={onDone} 
+                style={{ 
+                  marginTop: 8, 
+                  padding: '16px', 
+                  background: 'white', 
+                  border: '1.5px solid #F78C06', 
+                  borderRadius: 16, 
+                  fontFamily: 'Inter', 
+                  fontSize: 16, 
+                  fontWeight: 700, 
+                  color: '#F78C06', 
+                  cursor: 'pointer' 
+                }}
+              >
+                REGISTER
+              </button>
             </div>
 
             <p style={{ textAlign: 'center', marginTop: 24, fontSize: 12, color: '#7B7B7B', lineHeight: 1.6 }}>

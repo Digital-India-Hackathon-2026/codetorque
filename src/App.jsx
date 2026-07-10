@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppProvider } from './context/AppContext';
 import SplashScreen from './screens/SplashScreen';
+import RoleSelectionScreen from './screens/RoleSelectionScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
 import VehicleSelectScreen from './screens/VehicleSelectScreen';
@@ -17,9 +18,18 @@ import NotificationsScreen from './screens/NotificationsScreen';
 import VehicleModelScreen from './screens/VehicleModelScreen';
 import TabBar from './components/TabBar';
 
+import PartnerLoginScreen from './screens/partner/PartnerLoginScreen';
+import PartnerRegisterScreen from './screens/partner/PartnerRegisterScreen';
+import PartnerDashboardScreen from './screens/partner/PartnerDashboardScreen';
+import AdminLoginScreen from './screens/admin/AdminLoginScreen';
+import AdminDashboardScreen from './screens/admin/AdminDashboardScreen';
+
 // App flow states
 const FLOWS = {
   SPLASH: 'splash',
+  ROLE_SELECTION: 'role_selection',
+  
+  // Customer flows
   ONBOARDING: 'onboarding',
   LOGIN: 'login',
   VEHICLE_SELECT: 'vehicle_select',
@@ -27,6 +37,15 @@ const FLOWS = {
   VEHICLE_MODEL: 'vehicle_model',
   ADD_VEHICLE: 'add_vehicle',
   MAIN: 'main',
+
+  // Partner flows
+  PARTNER_LOGIN: 'partner_login',
+  PARTNER_REGISTER: 'partner_register',
+  PARTNER_DASHBOARD: 'partner_dashboard',
+
+  // Admin flows
+  ADMIN_LOGIN: 'admin_login',
+  ADMIN_DASHBOARD: 'admin_dashboard',
 };
 
 function AppContent() {
@@ -66,7 +85,7 @@ function AppContent() {
   const renderMain = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeScreen onNavigate={handleNavigate} />;
+        return <HomeScreen onNavigate={handleNavigate} onBookOffer={handleBook} />;
       case 'services':
         return <ServicesScreen initialService={serviceTarget.category} initialOption={serviceTarget.option} onBook={handleBook} />;
       case 'ai':
@@ -76,13 +95,26 @@ function AppContent() {
       case 'profile':
         return <ProfileScreen onAddVehicle={handleAddVehicleFlow} />;
       default:
-        return <HomeScreen onNavigate={handleNavigate} />;
+        return <HomeScreen onNavigate={handleNavigate} onBookOffer={handleBook} />;
     }
   };
 
   // ─── SPLASH ─────────────────────────────────────────────────────────
   if (flow === FLOWS.SPLASH) {
-    return <SplashScreen onDone={() => setFlow(FLOWS.ONBOARDING)} />;
+    return <SplashScreen onDone={() => setFlow(FLOWS.ROLE_SELECTION)} />;
+  }
+
+  // ─── ROLE SELECTION ─────────────────────────────────────────────────
+  if (flow === FLOWS.ROLE_SELECTION) {
+    return (
+      <RoleSelectionScreen
+        onSelect={(role) => {
+          if (role === 'customer') setFlow(FLOWS.ONBOARDING);
+          else if (role === 'partner') setFlow(FLOWS.PARTNER_LOGIN);
+          else if (role === 'admin') setFlow(FLOWS.ADMIN_LOGIN);
+        }}
+      />
+    );
   }
 
   // ─── ONBOARDING ──────────────────────────────────────────────────────
@@ -146,6 +178,43 @@ function AppContent() {
         onDone={() => setFlow(FLOWS.MAIN)}
       />
     );
+  }
+
+  // ─── PARTNER FLOWS ────────────────────────────────────────────────────
+  if (flow === FLOWS.PARTNER_LOGIN) {
+    return (
+      <PartnerLoginScreen 
+        onBack={() => setFlow(FLOWS.ROLE_SELECTION)}
+        onRegister={() => setFlow(FLOWS.PARTNER_REGISTER)}
+        onDone={() => setFlow(FLOWS.PARTNER_DASHBOARD)} 
+      />
+    );
+  }
+
+  if (flow === FLOWS.PARTNER_REGISTER) {
+    return (
+      <PartnerRegisterScreen
+        onBack={() => setFlow(FLOWS.ROLE_SELECTION)}
+      />
+    );
+  }
+
+  if (flow === FLOWS.PARTNER_DASHBOARD) {
+    return <PartnerDashboardScreen />;
+  }
+
+  // ─── ADMIN FLOWS ──────────────────────────────────────────────────────
+  if (flow === FLOWS.ADMIN_LOGIN) {
+    return (
+      <AdminLoginScreen 
+        onBack={() => setFlow(FLOWS.ROLE_SELECTION)}
+        onDone={() => setFlow(FLOWS.ADMIN_DASHBOARD)} 
+      />
+    );
+  }
+
+  if (flow === FLOWS.ADMIN_DASHBOARD) {
+    return <AdminDashboardScreen />;
   }
 
   // ─── MAIN APP ─────────────────────────────────────────────────────────

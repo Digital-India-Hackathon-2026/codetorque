@@ -7,6 +7,21 @@ const steps = ['Service', 'Date & Time', 'Address', 'Payment', 'Confirm'];
 const timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
 const dateOptions = ['Today', 'Tomorrow', 'Sat, Jul 12', 'Sun, Jul 13', 'Mon, Jul 14'];
 
+const serviceIncludes = {
+  'Car Wash': ['Exterior wash & rinse', 'Interior vacuum clean', 'Dashboard wipe', 'Tyre shine', 'Air freshener'],
+  'Bike Wash': ['Foam wash', 'Chain clean & lube', 'Engine degreasing', 'Polishing', 'Water wipe'],
+  'Mechanic': ['Detailed diagnostics', 'Engine tuning', 'Oil check', 'Brake inspection', 'Road test'],
+  'Battery': ['Jump start service', 'Battery replacement', 'Alternator check', 'Terminal cleaning', 'Voltage testing'],
+  'Tyre': ['Puncture repair', 'Air pressure check', 'Wheel balancing', 'Valve replacement', 'Tread check'],
+  'Service': ['Full periodic service', 'Oil & filter change', 'Coolant top-up', 'Brake cleaning', 'General inspection'],
+  'Inspection': ['120-point health check', 'OBD scanning', 'Road test', 'Detailed report', 'Recommendations'],
+  'Painting': ['Scratch/dent removal', 'Surface prep', 'OEM color paint', 'Clear coat application', 'Polishing'],
+  'Detailing': ['Exterior claying', 'Paint correction', 'Coating', 'Interior deep clean', 'Leather conditioning'],
+  'Towing': ['Flatbed towing', 'Winch-out service', 'Safe transport', '24/7 priority support'],
+  'Insurance': ['Policy renewal', 'Claim assistance', 'Accident support', 'Document verification'],
+  'Accessories': ['Genuine parts', 'Warranty support', 'Free fitting', 'Quality check'],
+};
+
 const paymentMethods = [
   { id: 'upi', icon: '📱', label: 'UPI', sub: 'Pay via any UPI app' },
   { id: 'card', icon: '💳', label: 'Debit/Credit Card', sub: 'Visa, Mastercard, RuPay' },
@@ -15,9 +30,8 @@ const paymentMethods = [
 
 function StepHeader({ current, onBack }) {
   return (
-    <div style={{
-      padding: '56px 24px 20px', position: 'sticky', top: 0,
-      background: 'rgba(250,250,250,0.95)', backdropFilter: 'blur(12px)', zIndex: 10,
+    <div className="ios-glass" style={{
+      padding: '56px 24px 20px', position: 'sticky', top: 0, zIndex: 10,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
         <button className="back-btn" onClick={onBack}>
@@ -55,7 +69,14 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
   const [booked, setBooked] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const prov = provider || { name: 'Shine Pro Auto Spa', price: '₹499', rating: 4.9 };
+  const prov = provider || { name: 'Shine Pro Auto Spa', price: '₹499', rating: 4.9, service: 'Car Wash' };
+  const currentIncludes = serviceIncludes[prov.service] || ['Standard service', 'Expert handling', 'Quality check', 'Priority support'];
+
+  const servicePriceStr = prov.price.replace(/[^\d]/g, '');
+  const servicePrice = parseInt(servicePriceStr, 10) || 0;
+  const platformFee = servicePrice === 0 ? 0 : 29;
+  const gst = Math.round(servicePrice * 0.06);
+  const total = servicePrice + platformFee + gst;
 
   const confirmBooking = () => {
     setLoading(true);
@@ -136,16 +157,23 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <div style={{ fontSize: 13, color: '#7B7B7B' }}>Service Price</div>
-                  <div style={{ fontSize: 24, fontWeight: 900, color: '#F78C06' }}>{prov.price}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900, color: '#F78C06' }}>
+                    {prov.originalPrice && (
+                      <span style={{ fontSize: 16, textDecoration: 'line-through', color: '#999', marginRight: 8 }}>
+                        {prov.originalPrice}
+                      </span>
+                    )}
+                    {prov.price}
+                  </div>
                 </div>
                 <div className="badge badge-success">Available Today</div>
               </div>
             </div>
 
             <div style={{ padding: '20px', background: 'white', borderRadius: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-              <p className="label" style={{ marginBottom: 12 }}>INCLUDES</p>
-              {['Exterior wash & rinse', 'Interior vacuum clean', 'Dashboard wipe', 'Tyre shine', 'Air freshener'].map((item, i) => (
-                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: i < 4 ? '1px solid rgba(74,74,72,0.06)' : 'none' }}>
+              <p className="label" style={{ marginBottom: 12 }}>INCLUDES ({prov.service?.toUpperCase() || 'SERVICE'})</p>
+              {currentIncludes.map((item, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: i < currentIncludes.length - 1 ? '1px solid rgba(74,74,72,0.06)' : 'none' }}>
                   <div style={{ width: 20, height: 20, borderRadius: 10, background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Check size={11} color="#22C55E" />
                   </div>
@@ -293,7 +321,9 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
             {/* Price Summary */}
             <div style={{ background: 'white', borderRadius: 20, padding: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
               <p className="label" style={{ marginBottom: 14 }}>PRICE SUMMARY</p>
-              {[['Service charge', prov.price], ['Platform fee', '₹29'], ['GST (18%)', '₹95']].map(([label, val], i) => (
+              {[['Service charge', prov.originalPrice ? <><span style={{textDecoration: 'line-through', color: '#999', marginRight: 8}}>{prov.originalPrice}</span>{prov.price}</> : prov.price], 
+                ['Platform fee', `₹${platformFee}`], 
+                ['GST (6%)', `₹${gst}`]].map(([label, val], i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(74,74,72,0.06)' }}>
                   <span style={{ fontSize: 13, color: '#7B7B7B' }}>{label}</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#4A4A48' }}>{val}</span>
@@ -301,7 +331,7 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 0 0' }}>
                 <span style={{ fontSize: 15, fontWeight: 800, color: '#4A4A48' }}>Total</span>
-                <span style={{ fontSize: 18, fontWeight: 900, color: '#F78C06' }}>₹623</span>
+                <span style={{ fontSize: 18, fontWeight: 900, color: '#F78C06' }}>₹{total}</span>
               </div>
             </div>
           </div>
@@ -316,7 +346,7 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
               { icon: <Calendar size={16} color="#7B7B7B" />, label: 'Date & Time', value: `${selectedDate} · ${selectedTime}` },
               { icon: <MapPin size={16} color="#7B7B7B" />, label: 'Address', value: address || 'Flat 204, Seaview Apt, Bandra West' },
               { icon: <CreditCard size={16} color="#7B7B7B" />, label: 'Payment', value: paymentMethods.find(p => p.id === payment)?.label },
-              { icon: <IndianRupee size={16} color="#7B7B7B" />, label: 'Total Amount', value: '₹623' },
+              { icon: <IndianRupee size={16} color="#7B7B7B" />, label: 'Total Amount', value: `₹${total}` },
             ].map((item, i) => (
               <div key={i} style={{
                 display: 'flex', gap: 12, alignItems: 'flex-start',
@@ -358,12 +388,10 @@ export default function BookingScreen({ provider, onDone, onCancel }) {
       </div>
 
       {/* Bottom CTA */}
-      <div style={{
+      <div className="ios-glass" style={{
         position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 430,
         padding: '16px 24px 32px',
-        background: 'rgba(250,250,250,0.95)', backdropFilter: 'blur(12px)',
-        borderTop: '1px solid rgba(74,74,72,0.06)',
       }}>
         <button
           className="btn-gradient"

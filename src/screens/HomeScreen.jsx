@@ -23,6 +23,7 @@ const offers = [
     gradient: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(247,140,6,0.5) 100%)',
     serviceId: 'carwash',
     optionId: 'foam',
+    provider: { name: 'MotoMate Assured', price: '₹349', originalPrice: '₹499', rating: 4.9, service: 'Car Wash' }
   },
   {
     title: 'Flat ₹999 OFF',
@@ -32,6 +33,7 @@ const offers = [
     gradient: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(16,185,129,0.5) 100%)',
     serviceId: 'carwash',
     optionId: 'ceramic',
+    provider: { name: 'Premium Detailing Studio', price: '₹2000', originalPrice: '₹2999', rating: 4.8, service: 'Car Wash' }
   },
   {
     title: 'First Wash Free',
@@ -41,6 +43,7 @@ const offers = [
     gradient: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(59,130,246,0.5) 100%)',
     serviceId: 'bikewash',
     optionId: 'bike-spa',
+    provider: { name: 'MotoShine Bike Spa', price: '₹0', originalPrice: '₹349', rating: 4.9, service: 'Bike Wash' }
   },
 ];
 
@@ -208,7 +211,7 @@ const searchItems = [
   },
 ];
 
-export default function HomeScreen({ onNavigate }) {
+export default function HomeScreen({ onNavigate, onBookOffer }) {
   const { user, vehicles, activeVehicle, notifications } = useApp();
   const vehicle = vehicles[activeVehicle];
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -258,7 +261,7 @@ export default function HomeScreen({ onNavigate }) {
               </div>
             </div>
             <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', marginBottom: 2 }}>
-              {greeting}, {user.name.split(' ')[0]}!
+              Welcome Mate!
             </h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <MapPin size={12} color="#7B7B7B" />
@@ -393,7 +396,7 @@ export default function HomeScreen({ onNavigate }) {
                 transition={{ delay: i * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
                 whileHover={{ scale: 1.02, y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => onNavigate('services', offer.serviceId, offer.optionId)}
+                onClick={() => onBookOffer(offer.provider)}
                 style={{
                   minWidth: 280, height: 160, borderRadius: 24,
                   position: 'relative', flexShrink: 0, overflow: 'hidden',
@@ -427,7 +430,7 @@ export default function HomeScreen({ onNavigate }) {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onNavigate('services', offer.serviceId, offer.optionId);
+                      onBookOffer(offer.provider);
                     }}
                     style={{
                     position: 'absolute', right: 20, bottom: 20,
