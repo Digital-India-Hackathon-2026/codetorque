@@ -1,38 +1,38 @@
 # Digital India Hackathon 2026
 
 ## Team Name
-SRS
+CodeTorque
 
 ## Repository
-srs
+codetorque
 
 ## Domain
-Digital Governance & Public Services
+Open Innovation & Emerging Technologies
 
 ## Idea
-SevaSetu – AI-Powered Multilingual Government Service Navigator
+MotoMate
 
-Millions of Indians struggle to access government services because information is scattered across multiple portals, procedures are complex, required documents are unclear, and language barriers make the process even more difficult. Many citizens end up relying on agents or unofficial sources, leading to misinformation, delays, and unnecessary expenses.
+Innovative Idea:
 
-Our solution, SevaSetu, is an AI-powered multilingual platform that simplifies access to Indian government services through one trusted portal. Users can search for any service such as Aadhaar, Passport, PAN Card, Voter ID, Driving Licence, Income Certificate, Caste Certificate, Government Schemes, and more.
+MotoMate is an AI-powered, location-based vehicle service marketplace that makes vehicle care simple, convenient, and accessible. Its primary focus is enabling users to easily book trusted car and bike washing services at nearby service centers or at their preferred location. Beyond vehicle washing, MotoMate also connects users with verified mechanics, service centers, towing providers, tyre repair, battery assistance, and emergency roadside support through a single platform. Using AI, GPS, and real-time tracking, users can instantly discover nearby service providers, compare ratings, prices, and estimated arrival times, and book services seamlessly. The platform also empowers local automotive businesses by providing them with a digital presence, increasing their visibility, and helping them reach more customers.
 
-For every service, the platform provides a personalized document checklist, eligibility criteria, step-by-step application guidance, official government website links, fees, processing time, FAQs, and common mistakes to avoid. An AI assistant enables users to ask questions in natural language and receive instant, easy-to-understand guidance. The platform initially supports English, Hindi, and Telugu, making government services more accessible to a wider audience.
+Real-World Problem:
 
-To further simplify the experience, users can locate nearby government service centers such as Aadhaar Centres, Passport Seva Kendras, MeeSeva Centres, and RTO offices based on their location or PIN code.
+Vehicle owners often struggle to find reliable and convenient car or bike washing services, especially those that offer quality service, transparent pricing, and easy booking. Most local vehicle washing centers and automotive businesses still operate offline, making it difficult for customers to discover nearby options or schedule services. During emergencies such as vehicle breakdowns, users also face challenges in finding trusted mechanics or roadside assistance quickly. MotoMate solves these problems by bringing vehicle washing and other essential automotive services together on one trusted, AI-powered platform.
 
-Our platform uses only verified information from official government sources, ensuring users receive accurate and trustworthy guidance while eliminating dependence on unofficial websites and middlemen.
+Impact:
 
-SevaSetu aims to bridge the gap between citizens and government services by making public services simple, transparent, multilingual, and accessible for every Indian.
+MotoMate simplifies vehicle care by enabling users to book trusted car and bike washing services while also providing quick access to mechanics and emergency assistance when needed. The platform helps local automotive businesses grow by giving them a digital presence and increasing customer reach. By promoting digital bookings, transparent pricing, AI-assisted service recommendations, and location-based discovery, MotoMate supports India's digital transformation and creates a smarter, more connected automotive service ecosystem.
 
 ## Team Members
-- Rishika Kamani
-- Shruthi Inti
-- Smruthi Rapally
+- Nanda Kishor Reddy Nelapatla
+- Sai Snehith Bathula
+- Sai Vinay Bellamkonda
 
 ## GitHub Profiles
-- https://github.com/rishikaKamani
-- github.com/IShruthii
-- https://github.com/smruthiRapally
+- https://github.com/nandunelapatla
+- github.com/24r11a6753-afk
+- https://github.com/saisnehith30-ab
 
 ---
 This file is an immutable record of the team's original hackathon submission.
