@@ -31,7 +31,7 @@ MotoMate simplifies vehicle care by enabling users to book trusted car and bike 
 
 ## GitHub Profiles
 - https://github.com/nandunelapatla
-- github.com/24r11a6753-afk
+- https://github.com/24r11a6753-afk
 - https://github.com/saisnehith30-ab
 
 ---
