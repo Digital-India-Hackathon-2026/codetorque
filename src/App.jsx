@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppProvider } from './context/AppContext';
+import { useAuth } from './hooks/useAuth';
+import { useApp } from './context/AppContext';
 import SplashScreen from './screens/SplashScreen';
 import RoleSelectionScreen from './screens/RoleSelectionScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
+import CustomerRegisterScreen from './screens/CustomerRegisterScreen';
 import VehicleSelectScreen from './screens/VehicleSelectScreen';
 import VehicleBrandScreen from './screens/VehicleBrandScreen';
 import AddVehicleScreen from './screens/AddVehicleScreen';
@@ -19,7 +21,6 @@ import VehicleModelScreen from './screens/VehicleModelScreen';
 import TabBar from './components/TabBar';
 
 import PartnerLoginScreen from './screens/partner/PartnerLoginScreen';
-import PartnerRegisterScreen from './screens/partner/PartnerRegisterScreen';
 import PartnerDashboardScreen from './screens/partner/PartnerDashboardScreen';
 import AdminLoginScreen from './screens/admin/AdminLoginScreen';
 import AdminDashboardScreen from './screens/admin/AdminDashboardScreen';
@@ -32,15 +33,14 @@ const FLOWS = {
   // Customer flows
   ONBOARDING: 'onboarding',
   LOGIN: 'login',
+  REGISTER: 'register',
   VEHICLE_SELECT: 'vehicle_select',
   VEHICLE_BRAND: 'vehicle_brand',
   VEHICLE_MODEL: 'vehicle_model',
   ADD_VEHICLE: 'add_vehicle',
   MAIN: 'main',
 
-  // Partner flows
   PARTNER_LOGIN: 'partner_login',
-  PARTNER_REGISTER: 'partner_register',
   PARTNER_DASHBOARD: 'partner_dashboard',
 
   // Admin flows
@@ -49,13 +49,42 @@ const FLOWS = {
 };
 
 function AppContent() {
+  const { user, profile, partnerData, loading: authLoading } = useAuth();
+  const { vehicles, setVehicles, setActiveVehicle } = useApp();
   const [flow, setFlow] = useState(FLOWS.SPLASH);
-  const [activeTab, setActiveTab] = useState('home');
-  const [vehicleType, setVehicleType] = useState('car');
+  const [vehicleType, setVehicleType] = useState(null);
   const [vehicleData, setVehicleData] = useState(null);
-  const [overlay, setOverlay] = useState(null); // 'booking' | 'notifications' | 'add_vehicle_flow'
+  const [overlay, setOverlay] = useState(null); // 'booking', 'notifications', 'add_vehicle_flow'
   const [bookingProvider, setBookingProvider] = useState(null);
+  const [activeTab, setActiveTab] = useState('home');
   const [serviceTarget, setServiceTarget] = useState({ category: 'carwash', option: null });
+  const [profileTarget, setProfileTarget] = useState('profile');
+
+  // ─── Auth Routing ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!authLoading) {
+      if (user && profile) {
+        // Default Customer routing (Admin and Partner mock flows handled manually via onDone)
+        if (profile.role === 'customer') {
+          const authFlows = [FLOWS.SPLASH, FLOWS.ROLE_SELECTION, FLOWS.LOGIN, FLOWS.REGISTER];
+          if (authFlows.includes(flow)) {
+            setFlow(FLOWS.VEHICLE_SELECT);
+          }
+        }
+      } else if (!user) {
+        // User is not logged in. 
+        // If they are in a protected customer flow, push to role selection
+        const protectedFlows = [
+          FLOWS.VEHICLE_SELECT, FLOWS.VEHICLE_BRAND, 
+          FLOWS.VEHICLE_MODEL, FLOWS.ADD_VEHICLE, FLOWS.MAIN
+        ];
+        
+        if (protectedFlows.includes(flow)) {
+           setFlow(FLOWS.ROLE_SELECTION);
+        }
+      }
+    }
+  }, [user, profile, authLoading, flow]);
 
   // ─── Navigation handlers ────────────────────────────────────────────
   const handleNavigate = (tab, subId, optionId) => {
@@ -68,6 +97,18 @@ function AppContent() {
         category: subId || 'carwash',
         option: optionId || null,
       });
+      setActiveTab('services');
+      return;
+    }
+    if (tab === 'profile' || tab === 'bookings' || tab === 'vehicles') {
+      let target = 'profile';
+      if (tab === 'bookings') target = 'bookings';
+      else if (tab === 'vehicles') target = 'vehicles';
+      else if (subId) target = subId;
+      
+      setProfileTarget(target);
+      setActiveTab('profile');
+      return;
     }
     setActiveTab(tab);
   };
@@ -93,15 +134,17 @@ function AppContent() {
       case 'sos':
         return <SOSScreen onBook={handleBook} />;
       case 'profile':
-        return <ProfileScreen onAddVehicle={handleAddVehicleFlow} />;
+        return <ProfileScreen onAddVehicle={handleAddVehicleFlow} initialTab={profileTarget} />;
       default:
         return <HomeScreen onNavigate={handleNavigate} onBookOffer={handleBook} />;
     }
   };
 
   // ─── SPLASH ─────────────────────────────────────────────────────────
-  if (flow === FLOWS.SPLASH) {
-    return <SplashScreen onDone={() => setFlow(FLOWS.ROLE_SELECTION)} />;
+  if (flow === FLOWS.SPLASH || authLoading) {
+    return <SplashScreen onDone={() => {
+       if (!authLoading && !user) setFlow(FLOWS.ROLE_SELECTION)
+    }} />;
   }
 
   // ─── ROLE SELECTION ─────────────────────────────────────────────────
@@ -124,7 +167,12 @@ function AppContent() {
 
   // ─── LOGIN ────────────────────────────────────────────────────────────
   if (flow === FLOWS.LOGIN) {
-    return <LoginScreen onDone={() => setFlow(FLOWS.VEHICLE_SELECT)} />;
+    return <LoginScreen onDone={() => setFlow(FLOWS.VEHICLE_SELECT)} onRegister={() => setFlow(FLOWS.REGISTER)} />;
+  }
+
+  // ─── REGISTER ─────────────────────────────────────────────────────────
+  if (flow === FLOWS.REGISTER) {
+    return <CustomerRegisterScreen onBack={() => setFlow(FLOWS.LOGIN)} onDone={() => setFlow(FLOWS.VEHICLE_SELECT)} />;
   }
 
   // ─── VEHICLE SELECT ──────────────────────────────────────────────────
@@ -175,7 +223,10 @@ function AppContent() {
         vehicleType={vehicleType}
         vehicleData={vehicleData}
         onBack={() => setFlow(FLOWS.VEHICLE_BRAND)}
-        onDone={() => setFlow(FLOWS.MAIN)}
+        onDone={() => {
+          setActiveTab('home');
+          setFlow(FLOWS.MAIN);
+        }}
       />
     );
   }
@@ -185,22 +236,13 @@ function AppContent() {
     return (
       <PartnerLoginScreen 
         onBack={() => setFlow(FLOWS.ROLE_SELECTION)}
-        onRegister={() => setFlow(FLOWS.PARTNER_REGISTER)}
         onDone={() => setFlow(FLOWS.PARTNER_DASHBOARD)} 
       />
     );
   }
 
-  if (flow === FLOWS.PARTNER_REGISTER) {
-    return (
-      <PartnerRegisterScreen
-        onBack={() => setFlow(FLOWS.ROLE_SELECTION)}
-      />
-    );
-  }
-
   if (flow === FLOWS.PARTNER_DASHBOARD) {
-    return <PartnerDashboardScreen />;
+    return <PartnerDashboardScreen onLogout={() => setFlow(FLOWS.ROLE_SELECTION)} />;
   }
 
   // ─── ADMIN FLOWS ──────────────────────────────────────────────────────
@@ -214,7 +256,7 @@ function AppContent() {
   }
 
   if (flow === FLOWS.ADMIN_DASHBOARD) {
-    return <AdminDashboardScreen />;
+    return <AdminDashboardScreen onLogout={() => setFlow(FLOWS.ROLE_SELECTION)} />;
   }
 
   // ─── MAIN APP ─────────────────────────────────────────────────────────
@@ -367,10 +409,4 @@ function AppContent() {
   );
 }
 
-export default function App() {
-  return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
-  );
-}
+export default AppContent;

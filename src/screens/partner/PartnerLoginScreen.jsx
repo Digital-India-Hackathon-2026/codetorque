@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, ChevronLeft, Briefcase } from 'lucide-react';
 
@@ -10,7 +11,15 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function PartnerLoginScreen({ onDone, onRegister, onBack }) {
+export default function PartnerLoginScreen({ onDone, onBack }) {
+  const [phone, setPhone] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (phone) {
+      onDone();
+    }
+  };
   return (
     <div style={{
       minHeight: '100vh',
@@ -57,6 +66,47 @@ export default function PartnerLoginScreen({ onDone, onRegister, onBack }) {
           </p>
         </div>
 
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', top: 18, left: 16 }}>
+              <Phone size={20} color="#7B7B7B" />
+            </div>
+            <input 
+              type="tel"
+              placeholder="Partner Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              style={{
+                width: '100%', padding: '16px 16px 16px 48px',
+                background: '#F5F5F5', border: '1px solid rgba(0,0,0,0.05)',
+                borderRadius: 16, fontSize: 15, fontFamily: 'Inter',
+                color: '#1A1A1A', outline: 'none'
+              }}
+            />
+          </div>
+
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '16px', background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+              border: 'none', borderRadius: 16,
+              fontFamily: 'Inter', fontSize: 16, fontWeight: 700, color: 'white',
+              cursor: 'pointer', boxShadow: '0 8px 24px rgba(59,130,246,0.3)',
+              marginTop: 8
+            }}
+          >
+            Access Dashboard
+          </motion.button>
+        </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '24px 0 16px' }}>
+          <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.05)' }} />
+          <span style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 600 }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(0,0,0,0.05)' }} />
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <motion.button
             whileTap={{ scale: 0.98 }}
@@ -70,22 +120,7 @@ export default function PartnerLoginScreen({ onDone, onRegister, onBack }) {
             }}
           >
             <GoogleIcon />
-            Continue with Google
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={onDone}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-              padding: '16px', background: 'white',
-              border: '1.5px solid rgba(74,74,72,0.1)', borderRadius: 16,
-              fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#4A4A48',
-              cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
-            }}
-          >
-            <Phone size={20} color="#4A4A48" />
-            Continue with Phone Number
+            Partner SSO Login
           </motion.button>
         </div>
 
@@ -94,13 +129,14 @@ export default function PartnerLoginScreen({ onDone, onRegister, onBack }) {
             Don't have a Partner Account?
           </p>
           <button 
-            onClick={onRegister}
             style={{ 
               background: 'none', border: 'none', color: '#3B82F6',
-              fontSize: 15, fontWeight: 700, marginTop: 8, cursor: 'pointer'
+              fontSize: 15, fontWeight: 700, marginTop: 8, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8, margin: '8px auto 0'
             }}
           >
-            Register Your Business
+            <Briefcase size={18} />
+            Become a Partner
           </button>
         </div>
       </motion.div>

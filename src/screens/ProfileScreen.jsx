@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, ChevronRight, Activity, Shield, Clock, Camera } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../hooks/useAuth';
 
 function VehicleHealthRing({ score }) {
   const r = 28, c = 2 * Math.PI * r;
@@ -202,9 +203,14 @@ const settingsSections = [
   },
 ];
 
-export default function ProfileScreen({ onAddVehicle }) {
-  const { user, vehicles, activeVehicle, setActiveVehicle, setVehicles, bookings, notifications, darkMode, setDarkMode } = useApp();
-  const [tab, setTab] = useState('profile');
+export default function ProfileScreen({ onAddVehicle, initialTab = 'profile' }) {
+  const { vehicles, activeVehicle, setActiveVehicle, setVehicles, bookings, notifications, darkMode, setDarkMode } = useApp();
+  const { user, logout } = useAuth();
+  const [tab, setTab] = useState(initialTab);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
 
   const tabs = ['profile', 'vehicles', 'bookings', 'settings'];
 
@@ -248,9 +254,9 @@ export default function ProfileScreen({ onAddVehicle }) {
             </div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#4A4A48' }}>{user.name}</div>
-            <div style={{ fontSize: 13, color: '#7B7B7B', marginTop: 2 }}>{user.phone}</div>
-            <div style={{ fontSize: 12, color: '#7B7B7B' }}>{user.email}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#4A4A48' }}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}</div>
+            <div style={{ fontSize: 13, color: '#7B7B7B', marginTop: 2 }}>{user?.phone || '+91 98765 43210'}</div>
+            <div style={{ fontSize: 12, color: '#7B7B7B' }}>{user?.email || 'No Email'}</div>
           </div>
           <button style={{
             width: 40, height: 40, borderRadius: 12,
@@ -326,10 +332,10 @@ export default function ProfileScreen({ onAddVehicle }) {
             <div>
               <div style={{ background: 'white', borderRadius: 24, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', marginBottom: 16 }}>
                 {[
-                  { icon: '👤', label: 'Full Name', value: user.name },
-                  { icon: '📱', label: 'Phone', value: user.phone },
-                  { icon: '✉️', label: 'Email', value: user.email },
-                  { icon: '📅', label: 'Member Since', value: user.memberSince },
+                  { icon: '👤', label: 'Full Name', value: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User' },
+                  { icon: '📱', label: 'Phone', value: user?.phone || 'Not provided' },
+                  { icon: '✉️', label: 'Email', value: user?.email || 'Not provided' },
+                  { icon: '📅', label: 'Member Since', value: user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A' },
                 ].map((item, i, arr) => (
                   <div key={i} style={{
                     display: 'flex', gap: 14, alignItems: 'center', padding: '16px 20px',
@@ -345,7 +351,9 @@ export default function ProfileScreen({ onAddVehicle }) {
                 ))}
               </div>
 
-              <button style={{
+              <button 
+                onClick={logout}
+                style={{
                 width: '100%', padding: '16px', background: 'rgba(255,77,79,0.06)',
                 border: '1.5px solid rgba(255,77,79,0.2)', borderRadius: 18,
                 fontFamily: 'Inter', fontSize: 15, fontWeight: 700, color: '#FF4D4F',

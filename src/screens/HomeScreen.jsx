@@ -212,7 +212,7 @@ const searchItems = [
 ];
 
 export default function HomeScreen({ onNavigate, onBookOffer }) {
-  const { user, vehicles, activeVehicle, notifications } = useApp();
+  const { vehicles, activeVehicle, notifications } = useApp();
   const vehicle = vehicles[activeVehicle];
   const unreadCount = notifications.filter(n => !n.read).length;
   const [searchQuery, setSearchQuery] = useState('');
@@ -384,7 +384,7 @@ export default function HomeScreen({ onNavigate, onBookOffer }) {
         <div style={{ marginBottom: 32 }}>
           <div className="section-header">
             <span className="label" style={{ color: '#1A1A1A', fontWeight: 800, fontSize: 16 }}>OFFERS & DEALS</span>
-            <button className="see-all">View all</button>
+            <button className="see-all" onClick={() => onNavigate('services')}>View all</button>
           </div>
 
           <div className="h-scroll" style={{ margin: '0 -24px', padding: '0 24px 10px' }}>

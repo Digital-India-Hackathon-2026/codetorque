@@ -110,14 +110,14 @@ function AdminBookingsTab() {
   );
 }
 
-function AdminSettingsTab() {
+function AdminSettingsTab({ onLogout }) {
   return (
     <div style={{ padding: '24px 24px 100px' }}>
       <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 24 }}>Platform Settings</h1>
       
       <div style={{ background: 'white', borderRadius: 16, border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden' }}>
         {['Service Categories', 'Pricing Templates', 'Offers & Promotions', 'Global Notifications', 'FAQ & Content', 'Logout'].map((item, i) => (
-          <div key={i} style={{ padding: 16, borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between' }}>
+          <div key={i} onClick={item === 'Logout' ? onLogout : undefined} style={{ padding: 16, borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', cursor: item === 'Logout' ? 'pointer' : 'default' }}>
             <span style={{ fontSize: 15, fontWeight: 600, color: item === 'Logout' ? '#EF4444' : '#1A1A1A' }}>{item}</span>
             <ChevronRight size={20} color="#ccc" />
           </div>
@@ -127,7 +127,7 @@ function AdminSettingsTab() {
   );
 }
 
-export default function AdminDashboardScreen() {
+export default function AdminDashboardScreen({ onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   const renderTab = () => {
@@ -136,7 +136,7 @@ export default function AdminDashboardScreen() {
       case 'partners': return <AdminPartnersTab />;
       case 'users': return <AdminUsersTab />;
       case 'bookings': return <AdminBookingsTab />;
-      case 'settings': return <AdminSettingsTab />;
+      case 'settings': return <AdminSettingsTab onLogout={onLogout} />;
       default: return <AdminOverviewTab />;
     }
   };

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Calendar, Wrench, User, ChevronRight, Briefcase, 
   MapPin, Phone, MessageCircle, Navigation, Clock, Activity,
-  CheckCircle, TrendingUp, BarChart2, DollarSign, Users, Store, Edit2
+  CheckCircle, TrendingUp, BarChart2, DollarSign, Users, Store, Edit2, AlertCircle
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 // --- MOCK DATA ---
 const initialBookings = [
@@ -330,7 +331,7 @@ function PartnerAnalyticsTab() {
   );
 }
 
-function PartnerProfileTab() {
+function PartnerProfileTab({ onLogout }) {
   const [activeSection, setActiveSection] = useState('profile'); // profile | customers
 
   if (activeSection === 'customers') {
@@ -394,7 +395,7 @@ function PartnerProfileTab() {
           <ChevronRight size={18} color="#3B82F6" />
         </div>
 
-        <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div onClick={onLogout} style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: '#EF4444' }}>Logout Account</span>
           <ChevronRight size={18} color="#FCA5A5" />
         </div>
@@ -403,8 +404,10 @@ function PartnerProfileTab() {
   );
 }
 
-export default function PartnerDashboardScreen() {
+export default function PartnerDashboardScreen({ onLogout }) {
   const [activeTab, setActiveTab] = useState('home');
+  const [showAvailability, setShowAvailability] = useState(true);
+  
   const [bookings, setBookings] = useState(initialBookings);
   const [services, setServices] = useState(initialServices);
 
@@ -418,7 +421,7 @@ export default function PartnerDashboardScreen() {
       case 'bookings': return <PartnerBookingsTab bookings={bookings} updateStatus={updateBookingStatus} />;
       case 'services': return <PartnerServicesTab services={services} setServices={setServices} />;
       case 'analytics': return <PartnerAnalyticsTab />;
-      case 'profile': return <PartnerProfileTab />;
+      case 'profile': return <PartnerProfileTab onLogout={onLogout} />;
       default: return <PartnerDashboardTab bookings={bookings} />;
     }
   };
