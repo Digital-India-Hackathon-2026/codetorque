@@ -3,54 +3,7 @@ import { createContext, useContext, useState } from 'react';
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const [user, setUser] = useState({
-    name: 'Vinay',
-    phone: '+91 98765 43210',
-    email: 'vinay@example.com',
-    photo: null,
-    memberSince: 'January 2024',
-  });
-
-  const [vehicles, setVehicles] = useState([
-    {
-      id: 1,
-      type: 'car',
-      brand: 'Hyundai',
-      model: 'Creta',
-      regNumber: 'MH 01 AB 1234',
-      nickname: 'My Creta',
-      fuel: 'Petrol',
-      transmission: 'Automatic',
-      color: 'Phantom Black',
-      year: '2022',
-      mileage: '23,450 km',
-      insurance: 'Valid till Dec 2025',
-      puc: 'Valid till Aug 2025',
-      healthScore: 87,
-      lastService: '12 Feb 2025',
-      nextService: '15 Aug 2025',
-      image: '/assets/vehicles/cars/hyundai/creta.png',
-    },
-    {
-      id: 2,
-      type: 'bike',
-      brand: 'Royal Enfield',
-      model: 'Classic 350',
-      regNumber: 'MH 01 CD 5678',
-      nickname: 'Thunder',
-      fuel: 'Petrol',
-      transmission: 'Manual',
-      color: 'Signals AOR',
-      year: '2021',
-      mileage: '12,800 km',
-      insurance: 'Valid till Mar 2026',
-      puc: 'Valid till Nov 2025',
-      healthScore: 92,
-      lastService: '03 Apr 2025',
-      nextService: '03 Oct 2025',
-      image: '/assets/vehicles/bikes/royal-enfield/classic-350.png',
-    },
-  ]);
+  const [vehicles, setVehicles] = useState([]);
 
   const [activeVehicle, setActiveVehicle] = useState(0);
 
@@ -109,7 +62,6 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      user, setUser,
       vehicles, setVehicles,
       activeVehicle, setActiveVehicle,
       bookings, setBookings,

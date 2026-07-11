@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Mail, ChevronRight, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 function GoogleIcon() {
   return (
@@ -13,7 +14,8 @@ function GoogleIcon() {
   );
 }
 
-function PhoneLoginView({ onBack, onDone }) {
+function PhoneLoginView({ onBack }) {
+  const { mockLogin } = useAuth();
   const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -27,7 +29,7 @@ function PhoneLoginView({ onBack, onDone }) {
 
   const verifyOtp = () => {
     setLoading(true);
-    setTimeout(() => { setLoading(false); onDone(); }, 1200);
+    setTimeout(() => { setLoading(false); mockLogin(); }, 1200);
   };
 
   const handleOtpChange = (val, idx) => {
@@ -123,8 +125,9 @@ function PhoneLoginView({ onBack, onDone }) {
   );
 }
 
-export default function LoginScreen({ onDone }) {
+export default function LoginScreen() {
   const [view, setView] = useState('main');
+  const { loginWithGoogle, loading, mockLogin } = useAuth();
 
   return (
     <div className="page page-enter" style={{ padding: '60px 24px 40px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -164,17 +167,25 @@ export default function LoginScreen({ onDone }) {
               {/* Google */}
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={onDone}
+                onClick={loginWithGoogle}
+                disabled={loading}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
                   padding: '16px', background: 'white',
                   border: '1.5px solid rgba(74,74,72,0.1)', borderRadius: 16,
                   fontFamily: 'Inter', fontSize: 15, fontWeight: 600, color: '#4A4A48',
                   cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                  opacity: loading ? 0.7 : 1
                 }}
               >
-                <GoogleIcon />
-                Continue with Google
+                {loading ? (
+                   <span style={{ color: '#7B7B7B', fontSize: 15, fontWeight: 600 }}>Connecting...</span>
+                ) : (
+                  <>
+                    <GoogleIcon />
+                    Continue with Google
+                  </>
+                )}
               </motion.button>
 
               {/* Phone */}
@@ -202,7 +213,7 @@ export default function LoginScreen({ onDone }) {
               {/* Email */}
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={onDone}
+                onClick={mockLogin}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
                   padding: '16px', background: 'white',
@@ -215,8 +226,25 @@ export default function LoginScreen({ onDone }) {
                 Continue with Email
               </motion.button>
 
-              <button className="btn-gradient" onClick={onDone} style={{ marginTop: 8 }}>
+              <button className="btn-gradient" onClick={mockLogin} style={{ marginTop: 8 }}>
                 LOGIN
+              </button>
+              <button 
+                onClick={mockLogin} 
+                style={{ 
+                  marginTop: 8, 
+                  padding: '16px', 
+                  background: 'white', 
+                  border: '1.5px solid #F78C06', 
+                  borderRadius: 16, 
+                  fontFamily: 'Inter', 
+                  fontSize: 16, 
+                  fontWeight: 700, 
+                  color: '#F78C06', 
+                  cursor: 'pointer' 
+                }}
+              >
+                REGISTER
               </button>
             </div>
 
@@ -230,7 +258,7 @@ export default function LoginScreen({ onDone }) {
 
         <AnimatePresence>
           {view === 'phone' && (
-            <PhoneLoginView onBack={() => setView('main')} onDone={onDone} />
+            <PhoneLoginView onBack={() => setView('main')} />
           )}
         </AnimatePresence>
       </div>

@@ -18,12 +18,12 @@ const carBrands = [
 ];
 
 const bikeBrands = [
-  { name: 'Hero', logo: '/assets/brands/bikes/hero/logo.svg', country: '🇮🇳' },
+  { name: 'Hero', logo: '/assets/brands/bikes/hero/logo.png', country: '🇮🇳' },
   { name: 'Honda', logo: '/assets/brands/bikes/honda/logo.png', country: '🇯🇵' },
-  { name: 'TVS', logo: '/assets/brands/bikes/tvs/logo.svg', country: '🇮🇳' },
-  { name: 'Yamaha', logo: '/assets/brands/bikes/yamaha/logo.svg', country: '🇯🇵' },
-  { name: 'KTM', logo: '/assets/brands/bikes/ktm/logo.svg', country: '🇦🇹' },
-  { name: 'Royal Enfield', logo: '/assets/brands/bikes/royal-enfield/logo.svg', country: '🇮🇳' },
+  { name: 'TVS', logo: '/assets/brands/bikes/tvs/logo.png', country: '🇮🇳' },
+  { name: 'Yamaha', logo: '/assets/brands/bikes/yamaha/logo.png', country: '🇯🇵' },
+  { name: 'KTM', logo: '/assets/brands/bikes/ktm/logo.png', country: '🇦🇹' },
+  { name: 'Royal Enfield', logo: '/assets/brands/bikes/royal-enfield/logo.png', country: '🇮🇳' },
   { name: 'Bajaj', logo: '/assets/brands/bikes/bajaj/logo.png', country: '🇮🇳' },
   { name: 'Suzuki', logo: '/assets/brands/bikes/suzuki/logo.png', country: '🇯🇵' },
 ];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, Droplets, Wrench, Battery, Circle, Truck, Shield, Settings, Zap, Brush, Store } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, MapPin, Clock, Droplets, Wrench, Battery, Circle, Truck, Shield, Settings, Zap, Brush, Store, ShoppingCart, ChevronLeft } from 'lucide-react';
 
 const categories = [
   { id: 'carwash', icon: <Droplets size={20} />, label: 'Car Wash', color: '#3B82F6' },
@@ -20,17 +20,15 @@ const categories = [
 const serviceOptions = {
   carwash: [
     { id: 'exterior', title: 'Exterior Wash', price: '₹299', time: '45 mins', image: '/assets/services/car-wash/exterior-wash.jpg', fallback: '/assets/services/car-wash/image.png', popular: false },
-    { id: 'interior', title: 'Interior Cleaning', price: '₹399', time: '60 mins', image: '/assets/services/car-wash/interior-cleaning.jpg', fallback: '/assets/services/car-wash/image.png', popular: false },
+    { id: 'interior', title: 'Interior Cleaning', price: '₹399', time: '60 mins', image: '/assets/services/car-wash/interior-cleaning.png', fallback: '/assets/services/car-wash/image.png', popular: false },
     { id: 'foam', title: 'Foam Wash', price: '₹499', time: '60 mins', image: '/assets/services/car-wash/foam-wash.jpg', fallback: '/assets/services/car-wash/image.png', popular: true },
-    { id: 'premium', title: 'Premium Wash', price: '₹799', time: '90 mins', image: '/assets/services/car-wash/premium-wash.jpg', fallback: '/assets/services/car-wash/image.png', popular: false },
-    { id: 'ceramic', title: 'Ceramic Coating', price: '₹2,999', time: '3 hrs', image: '/assets/services/car-wash/ceramic-coating.jpg', fallback: '/assets/services/car-wash/image.png', popular: false },
+    { id: 'ceramic', title: 'Ceramic Coating', price: '₹2,999', time: '3 hrs', image: '/assets/services/car-wash/ceramic-coating.png', fallback: '/assets/services/car-wash/image.png', popular: false },
     { id: 'doorstep', title: 'Doorstep Wash', price: '₹599', time: '75 mins', image: '/assets/services/car-wash/doorstep-wash.jpg', fallback: '/assets/services/car-wash/image.png', popular: false },
   ],
   bikewash: [
     { id: 'quick-bike', title: 'Quick Bike Wash', price: '₹149', time: '25 mins', image: '/assets/services/bike-wash/image.png', fallback: '/assets/services/bike-wash/image.png', popular: false },
-    { id: 'bike-spa', title: 'Bike Spa Service', price: '₹349', time: '50 mins', image: '/assets/offers/bike_spa.png', fallback: '/assets/services/bike-wash/image.png', popular: true },
-    { id: 'chain-clean', title: 'Chain Clean & Lube', price: '₹249', time: '35 mins', image: '/assets/services/bike-wash/image.png', fallback: '/assets/services/bike-wash/image.png', popular: false },
-    { id: 'engine-degrease', title: 'Engine Degreasing', price: '₹299', time: '40 mins', image: '/assets/services/bike-wash/image.png', fallback: '/assets/services/bike-wash/image.png', popular: false },
+    { id: 'chain-clean', title: 'Chain Clean & Lube', price: '₹249', time: '35 mins', image: '/assets/services/bike-wash/chain-clean.jpg', fallback: '/assets/services/bike-wash/image.png', popular: true },
+    { id: 'engine-degrease', title: 'Engine Degreasing', price: '₹299', time: '40 mins', image: '/assets/services/bike-wash/engine-degrease.png', fallback: '/assets/services/bike-wash/image.png', popular: false },
     { id: 'bike-detailing', title: 'Bike Detailing', price: '₹699', time: '80 mins', image: '/assets/offers/bike_spa.png', fallback: '/assets/services/bike-wash/image.png', popular: false },
   ],
 };
@@ -325,9 +323,11 @@ export default function ServicesScreen({ initialService, initialOption, onBook }
     initialService || 'carwash'
   );
   const [selectedWash, setSelectedWash] = useState(initialOption || null);
+  const [bookingProvider, setBookingProvider] = useState(null);
   const activeCat = categories.find(c => c.id === activeCategory) || categories[0];
   const activeOptions = serviceOptions[activeCategory] || [];
   const activeProviders = providerGroups[activeCategory] || [];
+  const selectedOptionData = activeOptions.find(o => o.id === selectedWash);
 
   useEffect(() => {
     if (initialService) {
@@ -373,74 +373,147 @@ export default function ServicesScreen({ initialService, initialOption, onBook }
         </div>
       </motion.div>
 
-      {/* Categories */}
-      <div style={{ padding: '0 24px 20px' }}>
-        <div className="h-scroll">
-          {categories.map(cat => (
-            <CategoryPill
-              key={cat.id}
-              cat={cat}
-              active={activeCategory === cat.id}
-              onClick={() => {
-                setActiveCategory(cat.id);
-                setSelectedWash(null);
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div style={{ padding: '0 24px' }}>
-        {/* Service Options (wash categories only) */}
-        {activeOptions.length > 0 && (
-          <motion.div
-            key={`${activeCategory}-options`}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            style={{ marginBottom: 28 }}
-          >
-            <p className="label" style={{ marginBottom: 14 }}>
-              {activeCategory === 'carwash' ? 'CAR WASHING TYPES' : 'BIKE WASHING TYPES'}
-            </p>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-              gap: 20
-            }}>
-              {activeOptions.map((opt, i) => (
-                <ServiceCard
-                  key={opt.id}
-                  opt={opt}
-                  isSelected={selectedWash === opt.id}
-                  onClick={() => setSelectedWash(opt.id === selectedWash ? null : opt.id)}
-                  delayIndex={i}
+      {/* Categories & Options or Shops List depending on selectedWash */}
+      {!selectedWash ? (
+        <>
+          {/* Categories */}
+          <div style={{ padding: '0 24px 20px' }}>
+            <div className="h-scroll">
+              {categories.map(cat => (
+                <CategoryPill
+                  key={cat.id}
+                  cat={cat}
+                  active={activeCategory === cat.id}
+                  onClick={() => {
+                    setActiveCategory(cat.id);
+                    setSelectedWash(null);
+                  }}
                 />
               ))}
             </div>
-          </motion.div>
-        )}
+          </div>
 
-        {/* Providers */}
-        {(!activeOptions.length || selectedWash) && (
+          <div style={{ padding: '0 24px' }}>
+            {/* Service Options (wash categories only) */}
+            {activeOptions.length > 0 && (
+              <motion.div
+                key={`${activeCategory}-options`}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                style={{ marginBottom: 28 }}
+              >
+                <p className="label" style={{ marginBottom: 14 }}>
+                  {activeCategory === 'carwash' ? 'CAR WASHING TYPES' : 'BIKE WASHING TYPES'}
+                </p>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: 20
+                }}>
+                  {activeOptions.map((opt, i) => (
+                    <ServiceCard
+                      key={opt.id}
+                      opt={opt}
+                      isSelected={selectedWash === opt.id}
+                      onClick={() => {
+                        setSelectedWash(opt.id);
+                        setBookingProvider(null);
+                      }}
+                      delayIndex={i}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Providers for Non-wash Categories */}
+            {!activeOptions.length && (
+              <motion.div
+                key={`${activeCategory}-providers`}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.28 }}
+                style={{ marginTop: 24 }}
+              >
+                <p className="label" style={{ marginBottom: 14 }}>
+                  {activeCategory === 'mechanic' ? 'MECHANIC SHOPS NEAR YOU' : `${activeCat.label.toUpperCase()} SHOPS NEAR YOU`}
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {activeProviders.map((p, i) => (
+                    <ProviderCard key={p.id} provider={p} accent={activeCat.color} onBook={() => setBookingProvider({ ...p, service: activeCat.label, price: p.price })} delayIndex={i} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </>
+      ) : (
+        <div style={{ padding: '0 24px' }}>
+          {/* Shops List Page View for selected wash */}
           <motion.div
-            key={`${activeCategory}-providers`}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, delay: activeOptions.length > 0 ? 0.08 : 0 }}
-            style={{ marginTop: 24 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            <p className="label" style={{ marginBottom: 14 }}>
-              {activeCategory === 'mechanic' ? 'MECHANIC SHOPS NEAR YOU' : `${activeCat.label.toUpperCase()} SHOPS NEAR YOU`}
-            </p>
+            <button 
+              onClick={() => { setSelectedWash(null); setBookingProvider(null); }}
+              style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 6, color: '#F78C06', fontWeight: 600, marginBottom: 24, cursor: 'pointer', padding: 0 }}
+            >
+              <ChevronLeft size={20} />
+              Back to Services
+            </button>
+            <h2 className="title-md" style={{ marginBottom: 6 }}>{selectedOptionData?.title} Shops</h2>
+            <p className="subtitle" style={{ marginBottom: 24, fontSize: 13 }}>Select a shop to add to your cart</p>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {activeProviders.map((p, i) => (
-                <ProviderCard key={p.id} provider={p} accent={activeCat.color} onBook={() => onBook({ ...p, service: activeCat.label })} delayIndex={i} />
+                <ProviderCard key={p.id} provider={p} accent={activeCat.color} onBook={() => setBookingProvider({ ...p, service: activeCat.label, price: selectedOptionData?.price || p.price })} delayIndex={i} />
               ))}
             </div>
           </motion.div>
+        </div>
+      )}
+
+      {/* Cart Floating Bar */}
+      <AnimatePresence>
+        {bookingProvider && (
+          <motion.div
+            initial={{ y: 150, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 150, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            style={{
+              position: 'fixed', bottom: 85, left: 0, right: 0, padding: '0 24px', zIndex: 100
+            }}
+          >
+            <div className="ios-glass-dark" style={{
+              borderRadius: 20, padding: '16px 20px',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 44, height: 44, background: 'rgba(255,255,255,0.1)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ShoppingCart size={22} color="white" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 600, marginBottom: 2 }}>Added to Cart</div>
+                  <div style={{ fontSize: 16, color: 'white', fontWeight: 800 }}>{bookingProvider.price}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => onBook(bookingProvider)}
+                style={{
+                  background: 'linear-gradient(135deg, #F78C06, #FFD21F)', border: 'none',
+                  padding: '12px 24px', borderRadius: 12, color: 'white', fontWeight: 700, fontSize: 14,
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(247,140,6,0.3)'
+                }}
+              >
+                Checkout
+              </button>
+            </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
